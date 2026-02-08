@@ -1,35 +1,35 @@
 @import "tailwindcss";
 
-/* Design System - TIMPIA Dashboard */
+/* Design System - TIMPIA Dashboard - Minimalist */
 :root {
-  --background: 0 0% 5%;
+  --background: 0 0% 4%;
   --foreground: 0 0% 98%;
-  --card: 0 0% 7.5%;
+  --card: 0 0% 6%;
   --card-foreground: 0 0% 98%;
-  --popover: 0 0% 7.5%;
+  --popover: 0 0% 6%;
   --popover-foreground: 0 0% 98%;
-  --primary: 270 70% 50%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 12%;
-  --secondary-foreground: 0 0% 95%;
-  --muted: 0 0% 14.9%;
-  --muted-foreground: 0 0% 63.9%;
-  --accent: 270 80% 55%;
-  --accent-foreground: 0 0% 100%;
+  --primary: 0 0% 98%;
+  --primary-foreground: 0 0% 4%;
+  --secondary: 0 0% 10%;
+  --secondary-foreground: 0 0% 90%;
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 55%;
+  --accent: 0 0% 15%;
+  --accent-foreground: 0 0% 98%;
   --destructive: 0 62.8% 40.6%;
   --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 16%;
-  --input: 0 0% 14.9%;
-  --ring: 270 70% 55%;
-  --chart-1: 270 70% 50%;
-  --chart-2: 160 60% 45%;
-  --chart-3: 30 80% 55%;
-  --chart-4: 200 70% 50%;
-  --chart-5: 340 75% 55%;
-  --radius: 0.5rem;
-  --sidebar-background: 0 0% 7%;
-  --sidebar-foreground: 0 0% 95%;
-  --sidebar-border: 0 0% 16%;
+  --border: 0 0% 12%;
+  --input: 0 0% 10%;
+  --ring: 0 0% 50%;
+  --chart-1: 0 0% 90%;
+  --chart-2: 0 0% 70%;
+  --chart-3: 0 0% 50%;
+  --chart-4: 0 0% 40%;
+  --chart-5: 0 0% 30%;
+  --radius: 0.75rem;
+  --sidebar-background: 0 0% 5%;
+  --sidebar-foreground: 0 0% 90%;
+  --sidebar-border: 0 0% 10%;
 }
 
 @theme inline {
@@ -76,20 +76,19 @@ body {
   min-height: 100vh;
 }
 
-/* Scrollbar styling */
+/* Scrollbar styling - minimal */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--muted));
-  border-radius: 4px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: hsl(var(--border));
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -123,3 +122,86 @@ body {
 .animate-pulse-slow {
   animation: pulse-slow 2s ease-in-out infinite;
 }
+
+/* Markdown styling */
+.prose-chat {
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.prose-chat p {
+  margin: 0.5em 0;
+}
+
+.prose-chat p:first-child {
+  margin-top: 0;
+}
+
+.prose-chat p:last-child {
+  margin-bottom: 0;
+}
+
+.prose-chat strong {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.prose-chat em {
+  font-style: italic;
+}
+
+.prose-chat code {
+  background: hsl(var(--muted));
+  padding: 0.15em 0.4em;
+  border-radius: 4px;
+  font-size: 0.85em;
+  font-family: ui-monospace, monospace;
+}
+
+.prose-chat pre {
+  background: hsl(var(--muted));
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin: 0.75em 0;
+}
+
+.prose-chat pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.prose-chat ul, .prose-chat ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.prose-chat li {
+  margin: 0.25em 0;
+}
+
+.prose-chat a {
+  color: hsl(var(--foreground));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose-chat a:hover {
+  opacity: 0.8;
+}
+
+.prose-chat blockquote {
+  border-left: 2px solid hsl(var(--border));
+  padding-left: 1em;
+  margin: 0.75em 0;
+  color: hsl(var(--muted-foreground));
+}
+
+.prose-chat h1, .prose-chat h2, .prose-chat h3 {
+  font-weight: 600;
+  margin: 1em 0 0.5em;
+}
+
+.prose-chat h1 { font-size: 1.25em; }
+.prose-chat h2 { font-size: 1.125em; }
+.prose-chat h3 { font-size: 1em; }

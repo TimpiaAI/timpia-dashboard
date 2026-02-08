@@ -1,11 +1,14 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { MessageSquare, Users, TrendingUp, Activity } from "lucide-react"
+import Link from "next/link"
+import { MessageSquare, Users, Activity, Database, User, ArrowRight } from "lucide-react"
 import { StatsCard } from "@/components/stats-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
+import { truncateText } from "@/lib/utils"
 
 interface Stats {
   totalConversations: number
@@ -60,8 +63,8 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="animate-pulse-slow text-muted-foreground">
-          Loading dashboard...
+        <div className="animate-pulse-slow text-muted-foreground text-sm">
+          Loading...
         </div>
       </div>
     )
@@ -70,40 +73,33 @@ export default function DashboardPage() {
   return (
     <div className="p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">
-          Monitor your chatbot activity and conversations
+        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">
+          Chatbot activity overview
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
         <StatsCard
-          title="Total Conversations"
+          title="Conversations"
           value={stats?.totalConversations || 0}
           icon={MessageSquare}
-          trend={{ value: 12, isPositive: true }}
-          description="from last week"
         />
         <StatsCard
-          title="Total Messages"
+          title="Messages"
           value={stats?.totalMessages || 0}
           icon={Activity}
-          trend={{ value: 8, isPositive: true }}
-          description="from last week"
         />
         <StatsCard
-          title="Unique Users"
+          title="Unique Sessions"
           value={stats?.uniqueUsers || 0}
           icon={Users}
-          trend={{ value: 5, isPositive: true }}
-          description="from last week"
         />
         <StatsCard
-          title="Active Sessions"
+          title="Active"
           value={stats?.activeSessions || 0}
-          icon={TrendingUp}
-          description="currently active"
+          icon={Database}
         />
       </div>
 
@@ -111,48 +107,52 @@ export default function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Recent Conversations */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-base font-medium">
               Recent Conversations
             </CardTitle>
+            <Link href="/conversations">
+              <Button variant="ghost" size="sm" className="text-xs">
+                View all <ArrowRight className="h-3 w-3 ml-1" />
+              </Button>
+            </Link>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-4">
+            <ScrollArea className="h-[320px]">
+              <div className="space-y-2">
                 {recentConversations.map((conv) => {
-                  const phoneNumber = conv.sessionId.replace(/[^0-9]/g, '').slice(-10)
                   const lastMessage = conv.messages[conv.messages.length - 1]
 
                   return (
                     <div
                       key={conv._id}
-                      className="flex items-start gap-3 rounded-lg border border-border p-3 transition-colors hover:bg-muted/50"
+                      className="flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-foreground/[0.02]"
                     >
-                      <Avatar>
-                        <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                          {phoneNumber.slice(0, 2)}
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="bg-foreground/5 text-foreground/60">
+                          <User className="h-3.5 w-3.5" />
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-sm">
-                          +{phoneNumber.slice(0, 2)} {phoneNumber.slice(2, 5)} ***
+                        <p className="text-xs font-mono text-muted-foreground truncate">
+                          {conv.sessionId}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate mt-0.5">
-                          {lastMessage?.data?.content?.slice(0, 60) || 'No messages'}...
+                        <p className="text-sm text-foreground/80 truncate mt-1">
+                          {lastMessage?.data?.content
+                            ? truncateText(lastMessage.data.content, 50)
+                            : 'No messages'}
                         </p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground">
-                            {conv.messages.length} messages
-                          </span>
-                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {conv.messages.length} messages
+                        </p>
                       </div>
                     </div>
                   )
                 })}
                 {recentConversations.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <p>No conversations yet</p>
+                  <div className="text-center py-12 text-muted-foreground">
+                    <MessageSquare className="h-8 w-8 mx-auto mb-3 opacity-30" />
+                    <p className="text-sm">No conversations yet</p>
                   </div>
                 )}
               </div>
@@ -163,37 +163,36 @@ export default function DashboardPage() {
         {/* Collections Overview */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5" />
-              Collections Overview
+            <CardTitle className="text-base font-medium">
+              Collections
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-foreground/[0.02] border border-foreground/5">
                 <div>
-                  <p className="font-medium">chat_marketmanager</p>
-                  <p className="text-xs text-muted-foreground">Main chat collection</p>
+                  <p className="font-mono text-sm">chat_marketmanager</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Main conversations</p>
                 </div>
-                <span className="text-2xl font-bold text-primary">
+                <span className="text-xl font-semibold tabular-nums">
                   {stats?.collections?.chat_marketmanager || 0}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-foreground/[0.02] border border-foreground/5">
                 <div>
-                  <p className="font-medium">n8n_chat_historiese</p>
-                  <p className="text-xs text-muted-foreground">N8N chat histories</p>
+                  <p className="font-mono text-sm">n8n_chat_historiese</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">N8N histories</p>
                 </div>
-                <span className="text-2xl font-bold text-primary">
+                <span className="text-xl font-semibold tabular-nums">
                   {stats?.collections?.n8n_chat_historiese || 0}
                 </span>
               </div>
-              <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-foreground/[0.02] border border-foreground/5">
                 <div>
-                  <p className="font-medium">sessions</p>
-                  <p className="text-xs text-muted-foreground">Active sessions</p>
+                  <p className="font-mono text-sm">sessions</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">Active sessions</p>
                 </div>
-                <span className="text-2xl font-bold text-primary">
+                <span className="text-xl font-semibold tabular-nums">
                   {stats?.collections?.sessions || 0}
                 </span>
               </div>

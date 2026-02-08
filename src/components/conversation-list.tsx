@@ -2,8 +2,9 @@
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { formatRelativeTime, truncateText } from "@/lib/utils"
+import { truncateText } from "@/lib/utils"
 import { cn } from "@/lib/utils"
+import { MessageSquare, User } from "lucide-react"
 
 export interface Message {
   type: "human" | "ai"
@@ -36,41 +37,38 @@ export function ConversationList({
         {conversations.map((conversation) => {
           const lastMessage = conversation.messages[conversation.messages.length - 1]
           const isSelected = selectedId === conversation._id
-          const phoneNumber = conversation.sessionId.replace(/[^0-9]/g, '').slice(-10)
 
           return (
             <button
               key={conversation._id}
               onClick={() => onSelect(conversation)}
               className={cn(
-                "w-full flex items-start gap-3 rounded-lg p-3 text-left transition-colors",
+                "w-full flex items-start gap-3 rounded-xl p-3 text-left transition-all",
                 isSelected
-                  ? "bg-primary/10 border border-primary/20"
-                  : "hover:bg-muted"
+                  ? "bg-foreground/5 border border-foreground/10"
+                  : "hover:bg-foreground/[0.02]"
               )}
             >
-              <Avatar className="h-10 w-10 shrink-0">
-                <AvatarFallback className="bg-primary/20 text-primary text-sm">
-                  {phoneNumber.slice(0, 2)}
+              <Avatar className="h-9 w-9 shrink-0">
+                <AvatarFallback className="bg-foreground/5 text-foreground/60">
+                  <User className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium truncate">
-                    +{phoneNumber.slice(0, 2)} {phoneNumber.slice(2, 5)} {phoneNumber.slice(5)}
+                  <p className="text-xs font-mono text-muted-foreground truncate max-w-[180px]">
+                    {conversation.sessionId}
                   </p>
-                  <span className="text-xs text-muted-foreground shrink-0">
-                    {conversation.updatedAt ? formatRelativeTime(conversation.updatedAt) : ''}
-                  </span>
                 </div>
-                <p className="text-xs text-muted-foreground truncate mt-0.5">
+                <p className="text-sm text-foreground/80 truncate mt-1">
                   {lastMessage?.data?.content
-                    ? truncateText(lastMessage.data.content, 50)
+                    ? truncateText(lastMessage.data.content, 60)
                     : 'No messages'}
                 </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs">
-                    {conversation.messages.length} msgs
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                    <MessageSquare className="h-3 w-3" />
+                    {conversation.messages.length}
                   </span>
                 </div>
               </div>
@@ -78,7 +76,8 @@ export function ConversationList({
           )
         })}
         {conversations.length === 0 && (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="text-center py-12 text-muted-foreground">
+            <MessageSquare className="h-8 w-8 mx-auto mb-3 opacity-30" />
             <p className="text-sm">No conversations found</p>
           </div>
         )}
