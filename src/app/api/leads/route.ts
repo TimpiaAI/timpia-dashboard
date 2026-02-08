@@ -58,70 +58,56 @@ interface LeadPayload {
 
 export async function POST(request: Request) {
   try {
-    const body: LeadPayload = await request.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body: any = await request.json()
 
-    // Extract leads from different payload formats
-    let leads: Lead[] = []
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let leads: any[] = []
 
     if (body.output && Array.isArray(body.output)) {
       // Format 1: { output: [{...}] }
       leads = body.output
-    } else if (body.content) {
+    } else if (body.content && typeof body.content === 'string') {
       // Format 2: { content: '{"output":[...]}' }
       try {
         const parsed = JSON.parse(body.content)
         if (parsed.output && Array.isArray(parsed.output)) {
           leads = parsed.output
+        } else {
+          // Content is JSON but not output array - store as single lead
+          leads = [parsed]
         }
       } catch {
         // Content is not valid JSON, ignore
       }
-    } else if (body.contact_name || body.contact_email || body.issue_summary) {
-      // Format: create_handoff_ticket (support ticket)
-      leads = [{
-        type: 'ticket',
-        nume_complet: body.contact_name,
-        email: body.contact_email,
-        telefon: body.contact_phone,
-        issue_summary: body.issue_summary,
-        category: body.category
-      }]
-    } else if (body.full_name || body.company || body.desired_features) {
-      // Format: submit_lead_data (English fields)
-      leads = [{
-        type: 'lead',
-        nume_complet: body.full_name,
-        firma: body.company,
-        nr_locatii: body.locations?.toString(),
-        email: body.email,
-        telefon: body.phone,
-        functionalitati_dorite: body.desired_features,
-        alte_nevoi: body.other_needs,
-        trial_interest: body.trial_interest,
-        consent_forward: body.consent_forward
-      }]
-    } else if (body.email || body.nume_complet || body.firma) {
-      // Format: Direct Romanian fields { clientId, nume_complet, firma, ... }
-      leads = [{
-        type: 'lead',
-        clientId: body.clientId,
-        nume_complet: body.nume_complet,
-        firma: body.firma,
-        nr_locatii: body.nr_locatii,
-        email: body.email,
-        telefon: body.telefon,
-        telefon_whatsapp: body.telefon_whatsapp,
-        functionalitati_dorite: body.functionalitati_dorite,
-        alte_nevoi: body.alte_nevoi,
-        photos: body.photos
-      }]
     }
 
+    // If no leads extracted yet, normalize known fields and store the whole body
     if (leads.length === 0) {
-      return NextResponse.json(
-        { error: 'No leads provided in payload' },
-        { status: 400 }
-      )
+      // Normalize common field variations to standard names
+      const normalized = { ...body }
+
+      // English -> Romanian field mapping
+      if (body.full_name && !body.nume_complet) normalized.nume_complet = body.full_name
+      if (body.company && !body.firma) normalized.firma = body.company
+      if (body.locations && !body.nr_locatii) normalized.nr_locatii = String(body.locations)
+      if (body.phone && !body.telefon) normalized.telefon = body.phone
+      if (body.desired_features && !body.functionalitati_dorite) normalized.functionalitati_dorite = body.desired_features
+      if (body.other_needs && !body.alte_nevoi) normalized.alte_nevoi = body.other_needs
+
+      // Ticket field mapping
+      if (body.contact_name && !body.nume_complet) normalized.nume_complet = body.contact_name
+      if (body.contact_email && !body.email) normalized.email = body.contact_email
+      if (body.contact_phone && !body.telefon) normalized.telefon = body.contact_phone
+
+      // Auto-detect type
+      if (body.issue_summary || body.category === 'bug' || body.category === 'support') {
+        normalized.type = 'ticket'
+      } else if (!normalized.type) {
+        normalized.type = 'lead'
+      }
+
+      leads = [normalized]
     }
 
     const db = await getDatabase()
