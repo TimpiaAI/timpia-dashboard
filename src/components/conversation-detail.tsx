@@ -39,10 +39,25 @@ function formatDateTime(date: Date | null): string {
   })
 }
 
-function MessageBubble({ message, index }: { message: Message; index: number }) {
+interface MessageBubbleProps {
+  message: Message
+  index: number
+  totalMessages: number
+  conversationDate: Date | null
+}
+
+function MessageBubble({ message, index, totalMessages, conversationDate }: MessageBubbleProps) {
   const isAI = message.type === "ai"
   const content = message.data?.content || '(empty message)'
   const time = formatTime(message.timestamp)
+
+  // If message has its own timestamp, use it. Otherwise show conversation date for first message
+  // or message position indicator for others
+  const displayTime = time
+    ? time
+    : (index === 0 && conversationDate)
+      ? conversationDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+      : null
 
   return (
     <div
@@ -73,11 +88,11 @@ function MessageBubble({ message, index }: { message: Message; index: number }) 
             <ReactMarkdown>{content}</ReactMarkdown>
           </div>
         </div>
-        {time && (
-          <p className={cn("text-[10px] text-muted-foreground mt-1 px-1", isAI ? "" : "text-right")}>
-            {time}
-          </p>
-        )}
+        <p className={cn("text-[10px] text-muted-foreground mt-1 px-1", isAI ? "" : "text-right")}>
+          {displayTime && <span>{displayTime} · </span>}
+          <span>{isAI ? 'AI' : 'Client'}</span>
+          <span className="ml-1 opacity-50">#{index + 1}</span>
+        </p>
       </div>
     </div>
   )
@@ -138,7 +153,13 @@ export function ConversationDetail({ conversation }: ConversationDetailProps) {
       <ScrollArea className="flex-1 p-4 md:p-6">
         <div className="space-y-3 md:space-y-4">
           {conversation.messages.map((message, index) => (
-            <MessageBubble key={index} message={message} index={index} />
+            <MessageBubble
+              key={index}
+              message={message}
+              index={index}
+              totalMessages={conversation.messages.length}
+              conversationDate={conversationDate}
+            />
           ))}
         </div>
       </ScrollArea>
