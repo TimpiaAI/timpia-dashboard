@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   MessageSquare,
   Sparkles,
+  Brain,
   LogOut,
   X
 } from "lucide-react"
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils"
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
   { name: "Conversations", href: "/conversations", icon: MessageSquare },
+  { name: "Training", href: "/training", icon: Brain },
   { name: "Analytics", href: "/analytics", icon: Sparkles },
 ]
 
