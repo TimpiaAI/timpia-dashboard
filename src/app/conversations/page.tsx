@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Search, RefreshCw, Database } from "lucide-react"
+import { Search, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ConversationList, Conversation } from "@/components/conversation-list"
 import { ConversationDetail } from "@/components/conversation-detail"
@@ -11,13 +11,12 @@ export default function ConversationsPage() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
-  const [collection, setCollection] = useState("chat_marketmanager")
 
   const fetchConversations = async () => {
     setLoading(true)
     try {
       const params = new URLSearchParams({
-        collection,
+        collection: 'chat_marketmanager',
         limit: '100',
         ...(search && { search })
       })
@@ -35,7 +34,7 @@ export default function ConversationsPage() {
 
   useEffect(() => {
     fetchConversations()
-  }, [collection])
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,19 +57,6 @@ export default function ConversationsPage() {
             >
               <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} />
             </Button>
-          </div>
-
-          {/* Collection Selector */}
-          <div className="flex items-center gap-2">
-            <Database className="h-3.5 w-3.5 text-muted-foreground" />
-            <select
-              value={collection}
-              onChange={(e) => setCollection(e.target.value)}
-              className="flex-1 rounded-lg border border-border/50 bg-transparent px-2 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-foreground/20"
-            >
-              <option value="chat_marketmanager">chat_marketmanager</option>
-              <option value="n8n_chat_historiese">n8n_chat_historiese</option>
-            </select>
           </div>
 
           {/* Search by Session ID */}
