@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
@@ -32,13 +31,9 @@ export function Sidebar() {
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-14 items-center px-5 border-b border-border/50">
-          <Image
-            src="/logo.svg"
-            alt="TIMPIA"
-            width={100}
-            height={28}
-            className="h-7 w-auto"
-          />
+          <span className="text-base font-bold tracking-wider text-white">
+            TIMPIA
+          </span>
         </div>
 
         {/* Navigation */}

@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
 import { Loader2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -43,13 +42,9 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm border-foreground/5">
         <CardContent className="p-6">
           <div className="text-center mb-6">
-            <Image
-              src="/logo.svg"
-              alt="TIMPIA"
-              width={120}
-              height={32}
-              className="h-8 w-auto mx-auto mb-4"
-            />
+            <h1 className="text-xl font-bold tracking-wider text-white mb-2">
+              TIMPIA
+            </h1>
             <p className="text-xs text-muted-foreground">
               Enter your access key to continue
             </p>
