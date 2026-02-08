@@ -4,17 +4,39 @@ import ReactMarkdown from 'react-markdown'
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import { Bot, User, Clock } from "lucide-react"
+import { Bot, User, Clock, Calendar } from "lucide-react"
 import type { Conversation, Message } from "./conversation-list"
 
 interface ConversationDetailProps {
   conversation: Conversation | null
 }
 
+// Extract timestamp from MongoDB ObjectId
+function getDateFromObjectId(objectId: string): Date | null {
+  try {
+    // MongoDB ObjectId: first 8 hex characters are the timestamp
+    const timestamp = parseInt(objectId.substring(0, 8), 16)
+    return new Date(timestamp * 1000)
+  } catch {
+    return null
+  }
+}
+
 function formatTime(timestamp?: string) {
   if (!timestamp) return null
   const date = new Date(timestamp)
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
+function formatDateTime(date: Date | null): string {
+  if (!date) return ''
+  return date.toLocaleString([], {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 function MessageBubble({ message, index }: { message: Message; index: number }) {
@@ -74,6 +96,11 @@ export function ConversationDetail({ conversation }: ConversationDetailProps) {
     )
   }
 
+  // Get conversation date from ObjectId or createdAt
+  const conversationDate = conversation.createdAt
+    ? new Date(conversation.createdAt)
+    : getDateFromObjectId(conversation._id)
+
   return (
     <div className="flex h-full flex-col">
       {/* Header */}
@@ -96,11 +123,11 @@ export function ConversationDetail({ conversation }: ConversationDetailProps) {
             <p className="text-xs text-muted-foreground">
               {conversation.messages.length} messages
             </p>
-            {conversation.createdAt && (
+            {conversationDate && (
               <p className="text-[10px] text-muted-foreground flex items-center gap-1 justify-end">
-                <Clock className="h-3 w-3" />
-                <span className="hidden sm:inline">{new Date(conversation.createdAt).toLocaleString()}</span>
-                <span className="sm:hidden">{new Date(conversation.createdAt).toLocaleDateString()}</span>
+                <Calendar className="h-3 w-3" />
+                <span className="hidden sm:inline">{formatDateTime(conversationDate)}</span>
+                <span className="sm:hidden">{conversationDate.toLocaleDateString()}</span>
               </p>
             )}
           </div>

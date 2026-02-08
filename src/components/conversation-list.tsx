@@ -4,7 +4,18 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { truncateText } from "@/lib/utils"
 import { cn } from "@/lib/utils"
-import { MessageSquare, User } from "lucide-react"
+import { MessageSquare, User, Calendar } from "lucide-react"
+
+// Extract timestamp from MongoDB ObjectId
+function getDateFromObjectId(objectId: string): Date | null {
+  try {
+    // MongoDB ObjectId: first 8 hex characters are the timestamp
+    const timestamp = parseInt(objectId.substring(0, 8), 16)
+    return new Date(timestamp * 1000)
+  } catch {
+    return null
+  }
+}
 
 export interface Message {
   type: "human" | "ai"
@@ -72,11 +83,17 @@ export function ConversationList({
                     <MessageSquare className="h-3 w-3" />
                     {conversation.messages.length}
                   </span>
-                  {conversation.updatedAt && (
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(conversation.updatedAt).toLocaleDateString()}
-                    </span>
-                  )}
+                  {(() => {
+                    const date = conversation.updatedAt
+                      ? new Date(conversation.updatedAt)
+                      : getDateFromObjectId(conversation._id)
+                    return date ? (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <Calendar className="h-3 w-3" />
+                        {date.toLocaleDateString()} {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    ) : null
+                  })()}
                 </div>
               </div>
             </button>
