@@ -4,7 +4,7 @@ import { getResend, EMAIL_FROM, generateLeadNotificationEmail } from '@/lib/emai
 
 export const dynamic = 'force-dynamic'
 
-const NOTIFICATION_EMAIL = 'info@marketmanager.ro'
+const NOTIFICATION_EMAILS = ['info@marketmanager.ro', 'ovidiu@timpia.ai']
 
 interface Lead {
   clientId?: string
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
           const emailContent = generateLeadNotificationEmail(lead)
           await resend.emails.send({
             from: EMAIL_FROM,
-            to: NOTIFICATION_EMAIL,
+            to: NOTIFICATION_EMAILS,
             subject: emailContent.subject,
             html: emailContent.html,
             text: emailContent.text,
