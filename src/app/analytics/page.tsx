@@ -76,10 +76,10 @@ export default function AnalyticsPage() {
   }
 
   return (
-    <div className="p-8 max-w-5xl">
-      <div className="flex items-center justify-between mb-8">
+    <div className="p-4 md:p-8 max-w-5xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 gap-4">
         <div>
-          <h1 className="text-2xl font-semibold">Analytics</h1>
+          <h1 className="text-xl md:text-2xl font-semibold">Analytics</h1>
           <p className="text-sm text-muted-foreground mt-1">
             AI-powered insights from your conversations
           </p>
@@ -90,8 +90,8 @@ export default function AnalyticsPage() {
         </Button>
       </div>
 
-      {/* Stats */}
-      <div className="grid gap-4 md:grid-cols-4 mb-8">
+      {/* Stats - 1 column on mobile, 2 on tablet, 4 on desktop */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8">
         <Card className="border-foreground/5">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground">Conversations</p>
@@ -118,16 +118,16 @@ export default function AnalyticsPage() {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
         {/* AI Summary */}
         <Card className="border-foreground/5">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-3 p-4 md:p-6">
             <CardTitle className="text-base font-medium flex items-center gap-2">
               <Sparkles className="h-4 w-4" />
               AI Summary
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
             <p className="text-sm text-foreground/80 leading-relaxed">
               {data?.insights?.summary || 'No summary available'}
             </p>
@@ -152,17 +152,17 @@ export default function AnalyticsPage() {
 
         {/* Top Questions */}
         <Card className="border-foreground/5">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-3 p-4 md:p-6">
             <CardTitle className="text-base font-medium flex items-center gap-2">
               <MessageSquare className="h-4 w-4" />
               Top Questions
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
             <div className="space-y-2">
               {data?.insights?.topQuestions?.map((question, i) => (
                 <div key={i} className="flex items-start gap-3 p-2 rounded-lg hover:bg-foreground/[0.02]">
-                  <span className="text-xs text-muted-foreground tabular-nums w-4">{i + 1}.</span>
+                  <span className="text-xs text-muted-foreground tabular-nums w-4 shrink-0">{i + 1}.</span>
                   <p className="text-sm flex-1">{question}</p>
                 </div>
               )) || (
@@ -174,13 +174,13 @@ export default function AnalyticsPage() {
 
         {/* Common Topics */}
         <Card className="border-foreground/5 lg:col-span-2">
-          <CardHeader className="pb-3">
+          <CardHeader className="pb-3 p-4 md:p-6">
             <CardTitle className="text-base font-medium flex items-center gap-2">
               <TrendingUp className="h-4 w-4" />
               Common Topics
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
             <div className="flex flex-wrap gap-2">
               {data?.insights?.commonTopics?.map((topic, i) => (
                 <span

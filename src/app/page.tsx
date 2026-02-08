@@ -68,16 +68,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+    <div className="p-4 md:p-8">
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-xl md:text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground mt-1">
           Chatbot activity overview
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      {/* Stats Grid - 1 column on mobile, 2 on tablet, 4 on desktop */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 md:mb-8">
         <StatsCard
           title="Conversations"
           value={stats?.totalConversations || 0}
@@ -101,10 +101,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Additional Stats */}
-      <div className="grid gap-4 md:grid-cols-2 mb-8">
+      <div className="grid gap-4 md:grid-cols-2 mb-6 md:mb-8">
         <Card className="border-foreground/5">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
+          <CardContent className="p-4 md:p-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <p className="text-xs text-muted-foreground mb-1">Unique Sessions</p>
                 <p className="text-2xl font-semibold tabular-nums">{stats?.uniqueSessions || 0}</p>
@@ -120,7 +120,7 @@ export default function DashboardPage() {
 
       {/* Recent Conversations */}
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-row items-center justify-between p-4 md:p-6">
           <CardTitle className="text-base font-medium">
             Recent Conversations
           </CardTitle>
@@ -130,7 +130,7 @@ export default function DashboardPage() {
             </Button>
           </Link>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
           <ScrollArea className="h-[400px]">
             <div className="space-y-2">
               {recentConversations.map((conv) => {
@@ -141,7 +141,7 @@ export default function DashboardPage() {
                     key={conv._id}
                     className="flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-foreground/[0.02]"
                   >
-                    <Avatar className="h-8 w-8">
+                    <Avatar className="h-8 w-8 shrink-0">
                       <AvatarFallback className="bg-foreground/5 text-foreground/60">
                         <User className="h-3.5 w-3.5" />
                       </AvatarFallback>

@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Search, RefreshCw } from "lucide-react"
+import { Search, RefreshCw, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ConversationList, Conversation } from "@/components/conversation-list"
 import { ConversationDetail } from "@/components/conversation-detail"
@@ -11,6 +11,7 @@ export default function ConversationsPage() {
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null)
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [showDetail, setShowDetail] = useState(false)
 
   const fetchConversations = async () => {
     setLoading(true)
@@ -41,10 +42,19 @@ export default function ConversationsPage() {
     fetchConversations()
   }
 
+  const handleSelectConversation = (conversation: Conversation) => {
+    setSelectedConversation(conversation)
+    setShowDetail(true)
+  }
+
+  const handleBackToList = () => {
+    setShowDetail(false)
+  }
+
   return (
     <div className="flex h-screen">
       {/* Left Panel - Conversation List */}
-      <div className="w-80 border-r border-border/50 flex flex-col bg-background">
+      <div className={`w-full md:w-80 border-r border-border/50 flex flex-col bg-background ${showDetail ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-border/50 space-y-3">
           <div className="flex items-center justify-between">
             <h1 className="text-sm font-medium">Conversations</h1>
@@ -82,7 +92,7 @@ export default function ConversationsPage() {
           <ConversationList
             conversations={conversations}
             selectedId={selectedConversation?._id}
-            onSelect={setSelectedConversation}
+            onSelect={handleSelectConversation}
           />
         )}
 
@@ -97,7 +107,19 @@ export default function ConversationsPage() {
       </div>
 
       {/* Right Panel - Conversation Detail */}
-      <div className="flex-1 bg-card/50">
+      <div className={`flex-1 bg-card/50 ${!showDetail ? 'hidden md:block' : 'block'}`}>
+        {/* Mobile back button */}
+        {showDetail && selectedConversation && (
+          <div className="md:hidden sticky top-0 z-10 bg-background border-b border-border/50 px-4 py-3">
+            <button
+              onClick={handleBackToList}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to list
+            </button>
+          </div>
+        )}
         <ConversationDetail conversation={selectedConversation} />
       </div>
     </div>
