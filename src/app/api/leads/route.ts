@@ -1,7 +1,10 @@
 import { NextResponse } from 'next/server'
 import { getDatabase } from '@/lib/mongodb'
+import { getResend, EMAIL_FROM, generateLeadNotificationEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
+
+const NOTIFICATION_EMAIL = 'info@marketmanager.ro'
 
 interface Lead {
   clientId?: string
@@ -87,10 +90,33 @@ export async function POST(request: Request) {
 
     const result = await collection.insertMany(leadsToInsert)
 
+    // Send email notification for each lead
+    let emailsSent = 0
+    if (process.env.RESEND_API_KEY) {
+      const resend = getResend()
+
+      for (const lead of leads) {
+        try {
+          const emailContent = generateLeadNotificationEmail(lead)
+          await resend.emails.send({
+            from: EMAIL_FROM,
+            to: NOTIFICATION_EMAIL,
+            subject: emailContent.subject,
+            html: emailContent.html,
+            text: emailContent.text,
+          })
+          emailsSent++
+        } catch (emailError) {
+          console.error('Failed to send email notification:', emailError)
+        }
+      }
+    }
+
     return NextResponse.json({
       success: true,
       message: `Successfully stored ${result.insertedCount} lead(s)`,
-      insertedIds: result.insertedIds
+      insertedIds: result.insertedIds,
+      emailsSent
     })
   } catch (error) {
     console.error('Error storing leads:', error)
