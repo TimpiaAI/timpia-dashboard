@@ -16,7 +16,11 @@ export function middleware(request: NextRequest) {
   const sessionValid = request.cookies.get('session_valid')?.value
 
   if (!sessionValid) {
-    // Redirect to login
+    // For API routes, return 401 instead of redirecting
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    // Redirect to login for pages
     const loginUrl = new URL('/login', request.url)
     return NextResponse.redirect(loginUrl)
   }
