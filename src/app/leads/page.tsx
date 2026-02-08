@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Search, RefreshCw, Mail, Phone, Building2, MapPin, User, Calendar } from "lucide-react"
+import { Search, RefreshCw, Mail, Phone, Building2, MapPin, User, Calendar, AlertCircle, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface Lead {
@@ -17,6 +17,11 @@ interface Lead {
   alte_nevoi?: string | null
   createdAt?: string
   source?: string
+  type?: 'lead' | 'ticket'
+  trial_interest?: boolean
+  consent_forward?: boolean
+  issue_summary?: string
+  category?: string
 }
 
 export default function LeadsPage() {
@@ -120,9 +125,20 @@ export default function LeadsPage() {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium text-sm truncate">
-                      {lead.nume_complet || 'Fara nume'}
-                    </span>
+                    <div className="flex items-center gap-2 min-w-0">
+                      {lead.type === 'ticket' ? (
+                        <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-medium bg-orange-500/10 text-orange-500 rounded">
+                          Ticket
+                        </span>
+                      ) : (
+                        <span className="shrink-0 px-1.5 py-0.5 text-[10px] font-medium bg-blue-500/10 text-blue-500 rounded">
+                          Lead
+                        </span>
+                      )}
+                      <span className="font-medium text-sm truncate">
+                        {lead.nume_complet || 'Fara nume'}
+                      </span>
+                    </div>
                     {lead.createdAt && (
                       <span className="text-[10px] text-muted-foreground shrink-0">
                         {formatDate(lead.createdAt)}
@@ -132,6 +148,11 @@ export default function LeadsPage() {
                   {lead.firma && (
                     <span className="text-xs text-muted-foreground truncate">
                       {lead.firma}
+                    </span>
+                  )}
+                  {lead.category && (
+                    <span className="text-xs text-orange-400 truncate">
+                      {lead.category}
                     </span>
                   )}
                   <div className="flex items-center gap-3 mt-1">
@@ -180,6 +201,27 @@ export default function LeadsPage() {
               <div className="max-w-2xl">
                 <div className="flex items-start justify-between mb-6">
                   <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      {selectedLead.type === 'ticket' ? (
+                        <span className="px-2 py-0.5 text-xs font-medium bg-orange-500/10 text-orange-500 rounded">
+                          Ticket
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 text-xs font-medium bg-blue-500/10 text-blue-500 rounded">
+                          Lead
+                        </span>
+                      )}
+                      {selectedLead.category && (
+                        <span className="px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground rounded">
+                          {selectedLead.category}
+                        </span>
+                      )}
+                      {selectedLead.trial_interest && (
+                        <span className="px-2 py-0.5 text-xs font-medium bg-green-500/10 text-green-500 rounded">
+                          Trial
+                        </span>
+                      )}
+                    </div>
                     <h2 className="text-xl font-semibold">
                       {selectedLead.nume_complet || 'Lead'}
                     </h2>
@@ -230,6 +272,17 @@ export default function LeadsPage() {
                       )}
                     </div>
                   </div>
+
+                  {/* Issue Summary (for tickets) */}
+                  {selectedLead.issue_summary && (
+                    <div className="bg-orange-500/5 rounded-lg border border-orange-500/20 p-4">
+                      <h3 className="text-sm font-medium mb-3 flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4 text-orange-500" />
+                        Problema Raportata
+                      </h3>
+                      <p className="text-sm whitespace-pre-wrap">{selectedLead.issue_summary}</p>
+                    </div>
+                  )}
 
                   {/* Needs */}
                   {(selectedLead.functionalitati_dorite || selectedLead.alte_nevoi) && (

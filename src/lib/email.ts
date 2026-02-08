@@ -24,6 +24,11 @@ export interface LeadEmailData {
   telefon_whatsapp?: string
   functionalitati_dorite?: string
   alte_nevoi?: string | null
+  type?: 'lead' | 'ticket'
+  trial_interest?: boolean
+  consent_forward?: boolean
+  issue_summary?: string
+  category?: string
 }
 
 export function generateLeadNotificationEmail(lead: LeadEmailData): {
@@ -31,7 +36,11 @@ export function generateLeadNotificationEmail(lead: LeadEmailData): {
   html: string
   text: string
 } {
-  const subject = `Lead nou: ${lead.firma || lead.nume_complet || 'Client nou'}`
+  const isTicket = lead.type === 'ticket'
+  const title = isTicket ? 'Ticket Support' : 'Lead Nou'
+  const subject = isTicket
+    ? `[${lead.category || 'Support'}] ${lead.nume_complet || 'Ticket nou'}`
+    : `Lead nou: ${lead.firma || lead.nume_complet || 'Client nou'}`
 
   const html = `
 <!DOCTYPE html>
@@ -41,18 +50,18 @@ export function generateLeadNotificationEmail(lead: LeadEmailData): {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: #1a1a1a; padding: 24px 30px;">
-    <h1 style="color: #fff; margin: 0; font-size: 20px; font-weight: 500;">Lead Nou</h1>
-    <p style="color: #888; margin: 4px 0 0 0; font-size: 14px;">MarketManager Dashboard</p>
+  <div style="background: ${isTicket ? '#7c2d12' : '#1a1a1a'}; padding: 24px 30px;">
+    <h1 style="color: #fff; margin: 0; font-size: 20px; font-weight: 500;">${title}</h1>
+    <p style="color: #888; margin: 4px 0 0 0; font-size: 14px;">MarketManager Dashboard${isTicket && lead.category ? ` - ${lead.category}` : ''}</p>
   </div>
 
   <div style="background: #fff; padding: 30px; border: 1px solid #e5e5e5; border-top: none;">
-    <h2 style="color: #333; margin-top: 0; font-size: 16px; font-weight: 600; margin-bottom: 20px;">Detalii Contact</h2>
+    <h2 style="color: #333; margin-top: 0; font-size: 16px; font-weight: 600; margin-bottom: 20px;">${isTicket ? 'Detalii Ticket' : 'Detalii Contact'}</h2>
 
     <table style="width: 100%; border-collapse: collapse;">
       ${lead.nume_complet ? `
       <tr>
-        <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: 500; color: #666; width: 40%;">Nume complet</td>
+        <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: 500; color: #666; width: 40%;">Nume</td>
         <td style="padding: 10px 0; border-bottom: 1px solid #eee;">${lead.nume_complet}</td>
       </tr>` : ''}
 
@@ -80,6 +89,12 @@ export function generateLeadNotificationEmail(lead: LeadEmailData): {
         <td style="padding: 10px 0; border-bottom: 1px solid #eee;">${lead.telefon || lead.telefon_whatsapp}</td>
       </tr>` : ''}
 
+      ${lead.issue_summary ? `
+      <tr>
+        <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: 500; color: #666;">Problema</td>
+        <td style="padding: 10px 0; border-bottom: 1px solid #eee;">${lead.issue_summary}</td>
+      </tr>` : ''}
+
       ${lead.functionalitati_dorite ? `
       <tr>
         <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: 500; color: #666;">Functionalitati dorite</td>
@@ -90,6 +105,12 @@ export function generateLeadNotificationEmail(lead: LeadEmailData): {
       <tr>
         <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: 500; color: #666;">Alte nevoi</td>
         <td style="padding: 10px 0; border-bottom: 1px solid #eee;">${lead.alte_nevoi}</td>
+      </tr>` : ''}
+
+      ${lead.trial_interest ? `
+      <tr>
+        <td style="padding: 10px 0; border-bottom: 1px solid #eee; font-weight: 500; color: #666;">Trial</td>
+        <td style="padding: 10px 0; border-bottom: 1px solid #eee;">Interesat de trial</td>
       </tr>` : ''}
 
       ${lead.clientId ? `
@@ -114,16 +135,19 @@ export function generateLeadNotificationEmail(lead: LeadEmailData): {
 `
 
   const text = `
-LEAD NOU - MarketManager Dashboard
+${title.toUpperCase()} - MarketManager Dashboard
 
-DETALII CONTACT:
-${lead.nume_complet ? `Nume complet: ${lead.nume_complet}` : ''}
+DETALII:
+${lead.nume_complet ? `Nume: ${lead.nume_complet}` : ''}
 ${lead.firma ? `Firma: ${lead.firma}` : ''}
 ${lead.nr_locatii ? `Nr. locatii: ${lead.nr_locatii}` : ''}
 ${lead.email ? `Email: ${lead.email}` : ''}
 ${lead.telefon || lead.telefon_whatsapp ? `Telefon: ${lead.telefon || lead.telefon_whatsapp}` : ''}
+${lead.issue_summary ? `Problema: ${lead.issue_summary}` : ''}
+${lead.category ? `Categorie: ${lead.category}` : ''}
 ${lead.functionalitati_dorite ? `Functionalitati dorite: ${lead.functionalitati_dorite}` : ''}
 ${lead.alte_nevoi ? `Alte nevoi: ${lead.alte_nevoi}` : ''}
+${lead.trial_interest ? `Trial: Interesat` : ''}
 ${lead.clientId ? `Client ID: ${lead.clientId}` : ''}
 
 Vezi in Dashboard: https://dashboard.timpia.ai/leads

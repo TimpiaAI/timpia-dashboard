@@ -17,12 +17,18 @@ interface Lead {
   functionalitati_dorite?: string
   alte_nevoi?: string | null
   photos?: string[]
+  // Additional fields
+  type?: 'lead' | 'ticket'
+  trial_interest?: boolean
+  consent_forward?: boolean
+  issue_summary?: string
+  category?: string
 }
 
 interface LeadPayload {
   output?: Lead[]
   content?: string
-  // Direct lead fields
+  // Format 1: Direct Romanian fields
   clientId?: string
   nume_complet?: string
   firma?: string
@@ -33,6 +39,21 @@ interface LeadPayload {
   functionalitati_dorite?: string
   alte_nevoi?: string | null
   photos?: string[]
+  // Format 2: submit_lead_data (English)
+  full_name?: string
+  company?: string
+  locations?: number | string
+  phone?: string
+  desired_features?: string
+  other_needs?: string
+  trial_interest?: boolean
+  consent_forward?: boolean
+  // Format 3: create_handoff_ticket
+  contact_name?: string
+  contact_phone?: string
+  contact_email?: string
+  issue_summary?: string
+  category?: string
 }
 
 export async function POST(request: Request) {
@@ -55,9 +76,34 @@ export async function POST(request: Request) {
       } catch {
         // Content is not valid JSON, ignore
       }
-    } else if (body.email || body.nume_complet || body.firma) {
-      // Format 3: Direct lead object { clientId, nume_complet, firma, ... }
+    } else if (body.contact_name || body.contact_email || body.issue_summary) {
+      // Format: create_handoff_ticket (support ticket)
       leads = [{
+        type: 'ticket',
+        nume_complet: body.contact_name,
+        email: body.contact_email,
+        telefon: body.contact_phone,
+        issue_summary: body.issue_summary,
+        category: body.category
+      }]
+    } else if (body.full_name || body.company || body.desired_features) {
+      // Format: submit_lead_data (English fields)
+      leads = [{
+        type: 'lead',
+        nume_complet: body.full_name,
+        firma: body.company,
+        nr_locatii: body.locations?.toString(),
+        email: body.email,
+        telefon: body.phone,
+        functionalitati_dorite: body.desired_features,
+        alte_nevoi: body.other_needs,
+        trial_interest: body.trial_interest,
+        consent_forward: body.consent_forward
+      }]
+    } else if (body.email || body.nume_complet || body.firma) {
+      // Format: Direct Romanian fields { clientId, nume_complet, firma, ... }
+      leads = [{
+        type: 'lead',
         clientId: body.clientId,
         nume_complet: body.nume_complet,
         firma: body.firma,
