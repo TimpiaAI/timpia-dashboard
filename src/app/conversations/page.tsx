@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Search, RefreshCw, ArrowLeft } from "lucide-react"
+import { Search, RefreshCw, ArrowLeft, Calendar } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ConversationList, Conversation } from "@/components/conversation-list"
 import { ConversationDetail } from "@/components/conversation-detail"
@@ -12,6 +12,8 @@ export default function ConversationsPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [showDetail, setShowDetail] = useState(false)
+  const [dateFrom, setDateFrom] = useState("")
+  const [dateTo, setDateTo] = useState("")
 
   const fetchConversations = async () => {
     setLoading(true)
@@ -19,7 +21,9 @@ export default function ConversationsPage() {
       const params = new URLSearchParams({
         collection: 'chat_marketmanager',
         limit: '100',
-        ...(search && { search })
+        ...(search && { search }),
+        ...(dateFrom && { dateFrom }),
+        ...(dateTo && { dateTo })
       })
       const res = await fetch(`/api/conversations?${params}`)
       if (res.ok) {
@@ -51,6 +55,13 @@ export default function ConversationsPage() {
     setShowDetail(false)
   }
 
+  const clearFilters = () => {
+    setSearch("")
+    setDateFrom("")
+    setDateTo("")
+    setTimeout(fetchConversations, 0)
+  }
+
   return (
     <div className="flex h-screen">
       {/* Left Panel - Conversation List */}
@@ -70,15 +81,52 @@ export default function ConversationsPage() {
           </div>
 
           {/* Search by Session ID */}
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Filter by session ID..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-lg border border-border/50 bg-transparent pl-8 pr-3 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20"
-            />
+          <form onSubmit={handleSearch} className="space-y-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <input
+                type="text"
+                placeholder="Filter by session ID..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full rounded-lg border border-border/50 bg-transparent pl-8 pr-3 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20"
+              />
+            </div>
+
+            {/* Date Filters */}
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Calendar className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => setDateFrom(e.target.value)}
+                  className="w-full rounded-lg border border-border/50 bg-transparent pl-7 pr-2 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20"
+                  title="From date"
+                />
+              </div>
+              <div className="flex-1 relative">
+                <Calendar className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => setDateTo(e.target.value)}
+                  className="w-full rounded-lg border border-border/50 bg-transparent pl-7 pr-2 py-1.5 text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-foreground/20"
+                  title="To date"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <Button type="submit" size="sm" className="flex-1 h-7 text-xs">
+                Filter
+              </Button>
+              {(search || dateFrom || dateTo) && (
+                <Button type="button" variant="ghost" size="sm" className="h-7 text-xs" onClick={clearFilters}>
+                  Clear
+                </Button>
+              )}
+            </div>
           </form>
         </div>
 

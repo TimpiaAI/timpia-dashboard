@@ -14,10 +14,28 @@ export async function GET(request: Request) {
     const db = await getDatabase()
     const coll = db.collection(collection)
 
+    // Get date filters
+    const dateFrom = searchParams.get('dateFrom')
+    const dateTo = searchParams.get('dateTo')
+
     // Build query
     const query: Record<string, unknown> = {}
     if (search) {
       query['sessionId'] = { $regex: search, $options: 'i' }
+    }
+
+    // Add date range filter
+    if (dateFrom || dateTo) {
+      query['createdAt'] = {}
+      if (dateFrom) {
+        (query['createdAt'] as Record<string, Date>)['$gte'] = new Date(dateFrom)
+      }
+      if (dateTo) {
+        // Set to end of day for dateTo
+        const endDate = new Date(dateTo)
+        endDate.setHours(23, 59, 59, 999)
+        ;(query['createdAt'] as Record<string, Date>)['$lte'] = endDate
+      }
     }
 
     // Get conversations
