@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { RefreshCw, Sparkles, MessageSquare, TrendingUp, AlertCircle, BarChart3, PieChart as PieChartIcon } from "lucide-react"
+import { RefreshCw, Sparkles, MessageSquare, TrendingUp, AlertCircle, BarChart3 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
@@ -11,13 +11,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  CartesianGrid,
-  Legend
+  CartesianGrid
 } from "recharts"
 
 interface Insights {
@@ -153,112 +147,21 @@ export default function AnalyticsPage() {
         </Card>
       </div>
 
-      {/* Charts Row */}
-      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2 mb-6 md:mb-8">
-        {/* Message Type Distribution (Pie Chart) */}
-        <Card className="border-foreground/5">
-          <CardHeader className="pb-3 p-4 md:p-6">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
-              <PieChartIcon className="h-4 w-4" />
-              Message Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
-            <div className="h-[200px] md:h-[250px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={chartData?.messageTypeData || []}
-                    cx="50%"
-                    cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                    labelLine={false}
-                  >
-                    {chartData?.messageTypeData?.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.fill} />
-                    ))}
-                  </Pie>
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#1a1a1a',
-                      border: '1px solid #333',
-                      borderRadius: '8px',
-                      fontSize: '12px'
-                    }}
-                  />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex justify-center gap-6 mt-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#6366f1]" />
-                <span className="text-xs text-muted-foreground">User</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#22c55e]" />
-                <span className="text-xs text-muted-foreground">AI</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Messages per Conversation (Bar Chart) */}
-        <Card className="border-foreground/5">
-          <CardHeader className="pb-3 p-4 md:p-6">
-            <CardTitle className="text-base font-medium flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Messages per Conversation
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
-            <div className="h-[200px] md:h-[250px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData?.recentConversations || []}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fill: '#888', fontSize: 10 }}
-                    axisLine={{ stroke: '#333' }}
-                  />
-                  <YAxis
-                    tick={{ fill: '#888', fontSize: 10 }}
-                    axisLine={{ stroke: '#333' }}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: '#1a1a1a',
-                      border: '1px solid #333',
-                      borderRadius: '8px',
-                      fontSize: '12px'
-                    }}
-                  />
-                  <Bar dataKey="messages" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Activity Over Time (Line Chart) */}
+      {/* Messages per Conversation (Bar Chart) */}
       <Card className="border-foreground/5 mb-6 md:mb-8">
         <CardHeader className="pb-3 p-4 md:p-6">
           <CardTitle className="text-base font-medium flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Activity Over Time
+            <BarChart3 className="h-4 w-4" />
+            Messages per Conversation
           </CardTitle>
         </CardHeader>
         <CardContent className="p-4 md:p-6 pt-0 md:pt-0">
           <div className="h-[200px] md:h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData?.activityData || []}>
+              <BarChart data={chartData?.recentConversations || []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                 <XAxis
-                  dataKey="date"
+                  dataKey="name"
                   tick={{ fill: '#888', fontSize: 10 }}
                   axisLine={{ stroke: '#333' }}
                 />
@@ -274,22 +177,8 @@ export default function AnalyticsPage() {
                     fontSize: '12px'
                   }}
                 />
-                <Legend />
-                <Line
-                  type="monotone"
-                  dataKey="conversations"
-                  stroke="#6366f1"
-                  strokeWidth={2}
-                  dot={{ fill: '#6366f1', strokeWidth: 2 }}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="messages"
-                  stroke="#22c55e"
-                  strokeWidth={2}
-                  dot={{ fill: '#22c55e', strokeWidth: 2 }}
-                />
-              </LineChart>
+                <Bar dataKey="messages" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </CardContent>
