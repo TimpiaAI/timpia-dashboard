@@ -4,16 +4,23 @@ import ReactMarkdown from 'react-markdown'
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-import { Bot, User } from "lucide-react"
+import { Bot, User, Clock } from "lucide-react"
 import type { Conversation, Message } from "./conversation-list"
 
 interface ConversationDetailProps {
   conversation: Conversation | null
 }
 
+function formatTime(timestamp?: string) {
+  if (!timestamp) return null
+  const date = new Date(timestamp)
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+}
+
 function MessageBubble({ message, index }: { message: Message; index: number }) {
   const isAI = message.type === "ai"
   const content = message.data?.content || '(empty message)'
+  const time = formatTime(message.timestamp)
 
   return (
     <div
@@ -31,17 +38,24 @@ function MessageBubble({ message, index }: { message: Message; index: number }) 
           {isAI ? <Bot className="h-4 w-4" /> : <User className="h-4 w-4" />}
         </AvatarFallback>
       </Avatar>
-      <div
-        className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-3",
-          isAI
-            ? "bg-card border border-border rounded-tl-sm"
-            : "bg-foreground/10 rounded-tr-sm"
-        )}
-      >
-        <div className="prose-chat">
-          <ReactMarkdown>{content}</ReactMarkdown>
+      <div className={cn("max-w-[80%]", isAI ? "" : "text-right")}>
+        <div
+          className={cn(
+            "rounded-2xl px-4 py-3",
+            isAI
+              ? "bg-card border border-border rounded-tl-sm"
+              : "bg-foreground/10 rounded-tr-sm"
+          )}
+        >
+          <div className="prose-chat">
+            <ReactMarkdown>{content}</ReactMarkdown>
+          </div>
         </div>
+        {time && (
+          <p className={cn("text-[10px] text-muted-foreground mt-1 px-1", isAI ? "" : "text-right")}>
+            {time}
+          </p>
+        )}
       </div>
     </div>
   )
@@ -78,10 +92,16 @@ export function ConversationDetail({ conversation }: ConversationDetailProps) {
               </p>
             </div>
           </div>
-          <div className="text-right">
+          <div className="text-right space-y-1">
             <p className="text-xs text-muted-foreground">
               {conversation.messages.length} messages
             </p>
+            {conversation.createdAt && (
+              <p className="text-[10px] text-muted-foreground flex items-center gap-1 justify-end">
+                <Clock className="h-3 w-3" />
+                {new Date(conversation.createdAt).toLocaleString()}
+              </p>
+            )}
           </div>
         </div>
       </div>

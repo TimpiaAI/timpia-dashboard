@@ -1,11 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import {
   LayoutDashboard,
   MessageSquare,
-  Sparkles
+  Sparkles,
+  LogOut
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -17,6 +18,13 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    await fetch('/api/auth', { method: 'DELETE' })
+    router.push('/login')
+    router.refresh()
+  }
 
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-56 border-r border-border/50 bg-background">
@@ -53,7 +61,14 @@ export function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="border-t border-border/50 p-4">
+        <div className="border-t border-border/50 p-4 space-y-3">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors w-full"
+          >
+            <LogOut className="h-3.5 w-3.5" />
+            Logout
+          </button>
           <p className="text-xs text-muted-foreground">
             dashboard.timpia.ai
           </p>

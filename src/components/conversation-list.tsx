@@ -11,12 +11,14 @@ export interface Message {
   data: {
     content: string
   }
+  timestamp?: string
 }
 
 export interface Conversation {
   _id: string
   sessionId: string
   messages: Message[]
+  createdAt?: string
   updatedAt?: string
 }
 
@@ -70,6 +72,11 @@ export function ConversationList({
                     <MessageSquare className="h-3 w-3" />
                     {conversation.messages.length}
                   </span>
+                  {conversation.updatedAt && (
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(conversation.updatedAt).toLocaleDateString()}
+                    </span>
+                  )}
                 </div>
               </div>
             </button>
