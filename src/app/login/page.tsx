@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { KeyRound, Loader2, AlertCircle } from "lucide-react"
+import Image from "next/image"
+import { Loader2, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -42,11 +43,14 @@ export default function LoginPage() {
       <Card className="w-full max-w-sm border-foreground/5">
         <CardContent className="p-6">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-foreground/5 mb-4">
-              <KeyRound className="h-5 w-5 text-foreground/60" />
-            </div>
-            <h1 className="text-lg font-semibold">TIMPIA Dashboard</h1>
-            <p className="text-xs text-muted-foreground mt-1">
+            <Image
+              src="/logo.svg"
+              alt="TIMPIA"
+              width={120}
+              height={32}
+              className="h-8 w-auto mx-auto mb-4"
+            />
+            <p className="text-xs text-muted-foreground">
               Enter your access key to continue
             </p>
           </div>
